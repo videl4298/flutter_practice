@@ -52,11 +52,11 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
-  void addProduct(Product product) {
-    var url = Uri.https(
-        'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json');
-    http.post(
+  Future<void> addProduct(Product product) {
+    var url = Uri.parse(
+        'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+    return http
+        .post(
       url,
       body: json.encode({
         'title': product.title,
@@ -64,17 +64,21 @@ class Products with ChangeNotifier {
         'imageUrl': product.price,
         'isFavorite': product.isFavorite,
       }),
-    );
-
-    final newProduct = Product(
-      id: DateTime.now().toString(),
-      title: product.title,
-      description: product.description,
-      price: product.price,
-      imageUrl: product.imageUrl,
-    );
-    _items.add(newProduct);
-    notifyListeners();
+    )
+        .then((value) {
+      final newProduct = Product(
+        id: json.decode(value.body)['name'],
+        title: product.title,
+        description: product.description,
+        price: product.price,
+        imageUrl: product.imageUrl,
+      );
+      _items.add(newProduct);
+      notifyListeners();
+    }).catchError((error) {
+      print(error);
+      throw (error);
+    });
   }
 
   Product findById(String id) {

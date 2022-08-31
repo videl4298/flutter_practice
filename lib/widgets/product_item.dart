@@ -44,12 +44,10 @@ class ProductItem extends StatelessWidget {
             color: Theme.of(context).colorScheme.secondary,
             onPressed: (() {
               cart.addItem(product.id, product.price, product.title);
-              Scaffold.of(context).hideCurrentSnackBar();
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: const Text('Added item to cart'),
-                duration: const Duration(
-                  seconds: 2,
-                ),
+              ScaffoldMessenger.of(context).hideCurrentSnackBar();
+              ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                content: const Text("Added item to cart"),
+                duration: const Duration(seconds: 2),
                 action: SnackBarAction(
                   label: 'Undo',
                   onPressed: (() {
@@ -57,6 +55,19 @@ class ProductItem extends StatelessWidget {
                   }),
                 ),
               ));
+              // Scaffold.of(context).hideCurrentSnackBar();
+              // Scaffold.of(context).showSnackBar(SnackBar(
+              //   content: const Text('Added item to cart'),
+              //   duration: const Duration(
+              //     seconds: 2,
+              //   ),
+              //   action: SnackBarAction(
+              //     label: 'Undo',
+              //     onPressed: (() {
+              //       cart.removeSingleItem(product.id);
+              //     }),
+              //   ),
+              // ));
             }),
             icon: const Icon(Icons.shopping_cart),
           ),
