@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/models/http_exception.dart';
 import 'package:http/http.dart' as http;
 
 import 'product.dart';
@@ -53,7 +54,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    var url = Uri.parse(
+    final url = Uri.parse(
         'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products.json');
     try {
       final response = await http.get(url);
@@ -69,6 +70,7 @@ class Products with ChangeNotifier {
           imageUrl: prodData['imageUrl'],
         ));
       });
+
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
@@ -77,7 +79,7 @@ class Products with ChangeNotifier {
   }
 
   Future<void> addProduct(Product product) async {
-    var url = Uri.parse(
+    final url = Uri.parse(
         'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products.json');
     try {
       final value = await http.post(
@@ -120,16 +122,44 @@ class Products with ChangeNotifier {
     return _items.where((productItem) => productItem.isFavorite).toList();
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<Null> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((prod) => prod.id == id);
     if (prodIndex >= 0) {
+      final url = Uri.parse(
+          'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+      await http.patch(url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }));
       _items[prodIndex] = newProduct;
       notifyListeners();
     }
   }
 
-  void deleteProduct(String id) {
-    _items.removeWhere((element) => element.id == id);
+  Future<Null> deleteProduct(String id) async {
+    final url = Uri.parse(
+        'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+
+    final existingProductIndex =
+        _items.indexWhere((element) => element.id == id);
+
+    Product? existingProduct = _items[existingProductIndex];
+
+    // _items.removeWhere((element) => element.id == id);
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+    final response = await http.delete(url);
+
+    if (response.statusCode >= 400) {
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Could not delete product.');
+    } else {}
+    existingProduct = null;
+
+    // notifyListeners();
   }
 }

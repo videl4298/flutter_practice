@@ -88,11 +88,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
     });
 
     if (_editedProduct.id.isNotEmpty) {
-      Provider.of<Products>(
+      await Provider.of<Products>(
         context,
         listen: false,
       ).updateProduct(_editedProduct.id, _editedProduct);
-      Navigator.of(context).pop();
+
       setState(() {
         _isLoading = false;
       });
@@ -120,9 +120,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
         setState(() {
           _isLoading = false;
         });
-        Navigator.of(context).pop();
       }
     }
+    Navigator.of(context).pop();
   }
 
   @override
@@ -228,7 +228,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         if (value!.isEmpty) {
                           return 'Please enter a description';
                         }
-                        if (value.length < 10) {
+                        if (value.length < 3) {
                           return 'Should be at least 10 characters long';
                         }
                         return null;
