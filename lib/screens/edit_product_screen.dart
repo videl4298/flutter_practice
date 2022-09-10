@@ -19,7 +19,6 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   void initState() {
-    // TODO: implement initState
     super.initState();
     _imageUrlFocusNode.addListener(_updateImageUrl);
   }
@@ -43,13 +42,11 @@ class _EditProductScreenState extends State<EditProductScreen> {
       }
     }
     _isInit = false;
-    // TODO: implement didChangeDependencies
     super.didChangeDependencies();
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
     super.dispose();
     _imageUrlFocusNode.removeListener(_updateImageUrl);
     _priceFocusNode.dispose();
@@ -80,7 +77,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm() {
+  Future<void> _saveForm() async {
     final isValid = _form.currentState!.validate();
     if (!isValid) {
       return;
@@ -100,11 +97,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
         _isLoading = false;
       });
     } else {
-      Provider.of<Products>(
-        context,
-        listen: false,
-      ).addProduct(_editedProduct).catchError((error) {
-        return showDialog<void>(
+      try {
+        await Provider.of<Products>(
+          context,
+          listen: false,
+        ).addProduct(_editedProduct);
+      } catch (error) {
+        await showDialog<void>(
             context: context,
             builder: ((ctx) => AlertDialog(
                   title: const Text('An error occured!'),
@@ -116,13 +115,13 @@ class _EditProductScreenState extends State<EditProductScreen> {
                         }),
                         child: const Text('Okay')),
                   ],
-                ))).then((_) {
-          setState(() {
-            _isLoading = false;
-          });
-          Navigator.of(context).pop();
+                )));
+      } finally {
+        setState(() {
+          _isLoading = false;
         });
-      });
+        Navigator.of(context).pop();
+      }
     }
   }
 

@@ -52,20 +52,20 @@ class Products with ChangeNotifier {
     return [..._items];
   }
 
-  Future<void> addProduct(Product product) {
+  Future<void> addProduct(Product product) async {
     var url = Uri.parse(
         'https://flutter-course-e58ea-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    return http
-        .post(
-      url,
-      body: json.encode({
-        'title': product.title,
-        'description': product.description,
-        'imageUrl': product.price,
-        'isFavorite': product.isFavorite,
-      }),
-    )
-        .then((value) {
+    try {
+      final value = await http.post(
+        url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.price,
+          'isFavorite': product.isFavorite,
+        }),
+      );
+
       final newProduct = Product(
         id: json.decode(value.body)['name'],
         title: product.title,
@@ -75,10 +75,16 @@ class Products with ChangeNotifier {
       );
       _items.add(newProduct);
       notifyListeners();
-    }).catchError((error) {
+    } catch (error) {
+      rethrow;
+    }
+    /*.then((value) {*/
+
+    //})
+    /*.catchError((error) {
       print(error);
       throw (error);
-    });
+    })*/
   }
 
   Product findById(String id) {
