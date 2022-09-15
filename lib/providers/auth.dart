@@ -41,15 +41,20 @@ class Auth with ChangeNotifier {
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
+
       _token = responseData['idToken'];
       _userId = responseData['localId'];
       _expiryDate = DateTime.now().add(Duration(
-        seconds: int.parse(responseData['expireIn']),
+        seconds: int.parse(responseData['expiresIn']),
       ));
       notifyListeners();
     } catch (error) {
       rethrow;
     }
+  }
+
+  String get userId {
+    return _userId as String;
   }
 
   Future<void> signup(String email, String password) async {
