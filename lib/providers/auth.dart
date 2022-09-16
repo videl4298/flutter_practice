@@ -53,7 +53,7 @@ class Auth with ChangeNotifier {
     }
   }
 
-  String get userId {
+  String? get userId {
     return _userId as String;
   }
 
@@ -63,5 +63,12 @@ class Auth with ChangeNotifier {
 
   Future<void> signin(String email, String password) async {
     return _authenticate(email, password, 'signInWithPassword');
+  }
+
+  void logout() {
+    _token = null;
+    // _userId = null;
+    // _expiryDate = null;
+    notifyListeners();
   }
 }
